@@ -43,41 +43,38 @@ WYMeditor.INIT_DIALOG = function(wym, selected, isIframe) {
 
   $(wym._options.dialogLinkSelector).find(wym._options.submitSelector).click(function(e)
   {
-    if ((sUrl = $(wym._options.hrefSelector).val()).length > 0)
+    var sUrl = $(wym._options.hrefSelector).val();
+    var inner_html = replaceable.html();
+    var link_title = $(wym._options.titleSelector).val();
+    if (!inner_html) {
+      //inner_html = $(wym._options.titleSelector);
+      inner_html = link_title;
+    }
+    if (sUrl.length > 0)
     {
-      if (replaceable.get(0) != null) {
-        var link = $('<a></a>').attr({href:sUrl, title: $(wym._options.titleSelector).val()})
-        if ((target = $(wym._options.targetSelector).val()) != null && target.length > 0) {
-          link.attr('target', target);
-        }
-
-        // now grab what was selected in the editor and chuck it inside the link.
-        if (!wym._selected_image)
-        {
-          // ensure some attributes are copied across to the new link.
-          link.attr({'style': replaceable.attr('style'), 'class': replaceable.attr('class')});
-
-          link.html(replaceable.html());
-          replaceable.replaceWith($('<div/>').append(link).html());
-        }
-        else
-        {
-          if ((parent = replaceable.parent().get(0)) != null && parent.tagName.toUpperCase() == "A") {
-            $(parent).attr({href: link.attr('href'), title: $(wym._options.titleSelector).val(), target: target});
-          }
-          else {
-            replaceable.before(link);
-            $(link).append(replaceable.get(0));
-          }
-        }
+      var link = $('<a></a>').attr({href: sUrl, title: link_title})
+      if ((target = $(wym._options.targetSelector).val()) != null && target.length > 0) {
+        link.attr('target', target);
       }
-      else {
-        wym._exec(WYMeditor.CREATE_LINK, wym._current_unique_stamp);
 
-        $("a[href=" + wym._current_unique_stamp + "]", wym._doc.body)
-          .attr(WYMeditor.HREF, sUrl)
-          .attr(WYMeditor.TITLE, $(wym._options.titleSelector).val())
-          .attr(WYMeditor.TARGET, $(wym._options.targetSelector).val());
+      // now grab what was selected in the editor and chuck it inside the link.
+      if (!wym._selected_image)
+      {
+        // ensure some attributes are copied across to the new link.
+        link.attr({'style': replaceable.attr('style'), 'class': replaceable.attr('class')});
+
+        link.html(inner_html);
+        replaceable.replaceWith($('<div/>').append(link).html());
+      }
+      else
+      {
+        if ((parent = replaceable.parent().get(0)) != null && parent.tagName.toUpperCase() == "A") {
+          $(parent).attr({href: link.attr('href'), title: $(wym._options.titleSelector).val(), target: target});
+        }
+        else {
+          replaceable.before(link);
+          $(link).append(replaceable.get(0));
+        }
       }
     }
     // fire a click event on the dialogs close button
